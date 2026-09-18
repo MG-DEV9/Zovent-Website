@@ -1,0 +1,47 @@
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const rateLimit = require('express-rate-limit');
+const connectDB = require('./config/db');
+const errorHandler = require('./middleware/errorHandler');
+
+dotenv.config();
+
+const app = express();
+
+// Allow all origins (production domains, custom hostnames, staging URLs, localhost) cleanly without throwing CORS preflight errors
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
+app.options('*', cors()); // Explicitly handle OPTIONS preflight requests for all endpoints
+app.use(express.json());
+
+app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+
+app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/razorpay', require('./routes/razorpayRoutes'));
+app.use('/api/transactions', require('./routes/transactionRoutes'));
+app.use('/api/holidays', require('./routes/holidayRoutes'));
+
+app.get('/api/health', (_req, res) =>
+  res.json({ status: 'ok', brand: 'SAY Experiences' })
+);
+
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+
+connectDB()
+  .then(async () => {
+    // Sync indexes to drop the old razorpayOrderId unique index
+    const Transaction = require('./models/Transaction');
+    await Transaction.syncIndexes();
+    
+    app.listen(PORT, () => console.log(`SAY Experiences Payment Server - port ${PORT}`));
+  })
+  .catch(() => {
+    console.error('Server not started because MongoDB is unavailable.');
+    process.exit(1);
+  });

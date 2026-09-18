@@ -1,0 +1,137 @@
+/* SAY Experiences — Brand Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap');
+
+:root {
+  /* Backgrounds */
+  --say-bg:           #0f0e0c;
+  --say-bg-card:      #18170f;
+  --say-bg-card-alt:  #1e1c12;
+
+  /* Borders */
+  --say-border:       #2e2b1e;
+  --say-border-gold:  #6b5a2e;
+
+  /* Gold palette */
+  --say-gold:         #c9a660;
+  --say-gold-light:   #e6c97c;
+  --say-gold-dim:     #7a6235;
+
+  /* Text */
+  --say-cream:        #ede8dc;
+  --say-cream-mid:    #c4bba7;
+  --say-cream-dim:    #7a7163;
+
+  /* Semantic */
+  --say-success:      #4a8c63;
+  --say-error:        #c0533a;
+  --say-warning:      #c9a030;
+
+  /* Typography */
+  --font-display: 'Cormorant Garant', 'Georgia', serif;
+  --font-body:    'Jost', 'Helvetica Neue', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--say-bg);
+  color: var(--say-cream);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--say-cream);
+  letter-spacing: -0.02em;
+}
+
+/* Utility classes */
+.say-card {
+  background: var(--say-bg-card);
+  border: 1px solid var(--say-border);
+  border-radius: 6px;
+  padding: 1.75rem;
+}
+
+.say-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--say-bg-card-alt);
+  border: 1px solid var(--say-border);
+  border-radius: 4px;
+  color: var(--say-cream);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.say-input:focus { border-color: var(--say-border-gold); }
+.say-input.error { border-color: var(--say-error); }
+
+.say-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--say-cream-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.say-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #b8922e, var(--say-gold), #b8922e);
+  background-size: 200% 100%;
+  border: none;
+  border-radius: 2px;
+  color: var(--say-bg);
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.say-btn-primary:hover { opacity: 0.9; }
+.say-btn-primary:active { transform: scale(0.98); }
+.say-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.say-btn-secondary {
+  padding: 10px 22px;
+  background: transparent;
+  border: 1px solid var(--say-border-gold);
+  border-radius: 2px;
+  color: var(--say-gold);
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.say-btn-secondary:hover { background: rgba(201,166,96,0.07); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.fade-up { animation: fadeUp 0.4s ease forwards; }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--say-gold-dim);
+  border-top-color: var(--say-gold);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}

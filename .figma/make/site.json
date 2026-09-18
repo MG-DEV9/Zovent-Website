@@ -1,0 +1,10 @@
+{
+  "description": "Facilitates seamless corporate event planning and booking with premium services for conferences, travel, and team-building tailored to business clients.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Manrope:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme inline {
+  --color-cherry:      #670626;
+  --color-matcha:      #BAD797;
+  --color-cream:       #FAF8F2;
+  --color-pale-cherry: #F2E6EA;
+  --color-pale-matcha: #EFF5E2;
+  --color-ink:         #1A0A0E;
+  --font-display:      'Cormorant Garamond', Georgia, serif;
+  --font-body:         Georgia, 'Times New Roman', serif;
+  --font-label:        'Manrope', system-ui, sans-serif;
+}
+
+:root {
+  font-family: Georgia, 'Times New Roman', serif;
+  background-color: #FAF8F2;
+  color: #1A0A0E;
+  scroll-behavior: smooth;
+  cursor: none;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── Subtle grain overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.018;
+  mix-blend-mode: multiply;
+}
+
+/* ── Marquee ── */
+@keyframes marquee-left  { from { transform: translateX(0) }    to { transform: translateX(-50%) } }
+@keyframes marquee-right { from { transform: translateX(-50%) } to { transform: translateX(0) } }
+
+.marquee-track     { animation: marquee-left  28s linear infinite; }
+.marquee-track-rev { animation: marquee-right 28s linear infinite; }
+.marquee-track:hover,
+.marquee-track-rev:hover { animation-play-state: paused; }
+
+/* ── Scroll-reveal base state ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── Hero entrance ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.afu   { animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) both; }
+.afu-1 { animation-delay: 0.1s; }
+.afu-2 { animation-delay: 0.28s; }
+.afu-3 { animation-delay: 0.48s; }
+.afu-4 { animation-delay: 0.65s; }
+
+/* ── Doubled-hover CTA ── */
+.cta-double {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 1.15em;
+  line-height: 1.15em;
+  vertical-align: bottom;
+}
+.cta-double span {
+  display: block;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.cta-double span:last-child {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  color: #670626;
+}
+.cta-double:hover span { transform: translateY(-100%); }
+
+/* ── Scrollbar ── */
+html { scrollbar-width: thin; scrollbar-color: #BAD797 #FAF8F2; }
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: #FAF8F2; }
+::-webkit-scrollbar-thumb { background: #BAD797; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #670626; }
+
+/* ── Utility ── */
+.font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
+.font-body    { font-family: Georgia, 'Times New Roman', serif; }
+.font-label   { font-family: 'Manrope', system-ui, sans-serif; }
+
+/* restore cursor on mobile / touch */
+@media (hover: none) {
+  :root { cursor: auto; }
+}
