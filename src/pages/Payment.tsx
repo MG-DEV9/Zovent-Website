@@ -247,7 +247,7 @@ export default function Payment() {
                     value={reference}
                     onChange={e => setReference(e.target.value)}
                     className={inputCls}
-                    placeholder="ZOV-MICE-0001"
+                    placeholder="xxx-MICE-xxx1"
                     style={{ fontFamily: BODY }}
                   />
                   <button

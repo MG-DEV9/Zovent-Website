@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { useReveal } from '../hooks/useReveal'
+import { posts as blogPostsData } from '../data/blog'
 
 const D = "'Cormorant Garamond', Georgia, serif"
 const B = "'Manrope', system-ui, sans-serif"
@@ -42,11 +43,12 @@ const CLIENT_LOGOS = [
 const MARQUEE_CL = [...CLIENT_LOGOS, ...CLIENT_LOGOS]
 
 const services = [
-  { num: '01', title: 'CORPORATE CONFERENCES & MEETINGS', tag: 'CONFERENCES', href: '/services#conferences', img: EV5, desc: 'From intimate boardroom meetings to large-scale corporate conferences, Zovent plans and manages every detail — from venue and technology to delegates, speakers and on-ground execution' },
-  { num: '02', title: 'M.I.C.E', tag: 'MICE', href: '/services#mice', img: EV1, desc: 'From high-impact corporate meetings and incentive trips to conferences and exhibitions, Zovent creates seamless MICE experiences designed around your brand, business goals and people. We manage every detail — from destination selection and travel logistics to event production, hospitality and on-ground execution — across India and international destinations.' },
-  { num: '03', title: 'OFFSITES & TEAM BUILDING', tag: 'OFFSITES', href: '/services#offsites', img: EV2, desc: 'Purposefully designed corporate offsites that bring teams together, spark fresh thinking and create experiences people actually remember. From leadership retreats and strategic offsites to team-building activities and experiential getaways, Zovent manages every detail from concept to execution.' },
-  { num: '04', title: 'CREATE MOMENTS. BUILD BRAND', tag: 'ACTIVATIONS', href: '/services#activations', img: EV3, desc: 'Strategic brand activation experiences that turn attention into engagement and audiences into advocates. From product launches and experiential marketing events to corporate celebrations and immersive brand experiences, Zovent brings your brand to life through memorable moments.nies and gala dinners to corporate recognition and milestone events.' },
-  { num: '06', title: 'CORPORATE & LUXURY TRAVEL', tag: 'TRAVEL', href: '/services#travel', img: LOBBY, desc: 'From seamless business travel to bespoke group getaways, Zovent manages every journey with precision, comfort and care. We curate corporate travel, incentive trips, luxury holidays and group travel experiences across India and international destinations — tailored around your people, purpose and preferences.' },
+  { num: '01', title: 'CORPORATE CONFERENCES & MEETINGS', tag: 'CONFERENCES', href: '/services/conferences', img: '/assets/Services/Conferences.png', desc: 'From intimate boardroom meetings to large-scale corporate conferences, Zovent plans and manages every detail — from venue and technology to delegates, speakers and on-ground execution' },
+  { num: '02', title: 'M.I.C.E', tag: 'MICE', href: '/services/mice', img: '/assets/Services/M.I.C.E. (1).png', desc: 'From high-impact corporate meetings and incentive trips to conferences and exhibitions, Zovent creates seamless MICE experiences designed around your brand, business goals and people. We manage every detail — from destination selection and travel logistics to event production, hospitality and on-ground execution — across India and international destinations.' },
+  { num: '03', title: 'OFFSITES & TEAM BUILDING', tag: 'OFFSITES', href: '/services/offsites', img: '/assets/Services/Offsites.png', desc: 'Purposefully designed corporate offsites that bring teams together, spark fresh thinking and create experiences people actually remember. From leadership retreats and strategic offsites to team-building activities and experiential getaways, Zovent manages every detail from concept to execution.' },
+  { num: '04', title: 'CREATE MOMENTS. BUILD BRAND', tag: 'ACTIVATIONS', href: '/services/activations', img: '/assets/Services/Brand activation.png', desc: 'Strategic brand activation experiences that turn attention into engagement and audiences into advocates. From product launches and experiential marketing events to corporate celebrations and immersive brand experiences, Zovent brings your brand to life through memorable moments.' },
+  { num: '05', title: 'AWARD CEREMONIES & RECOGNITION', tag: 'AWARDS', href: '/services/awards', img: '/assets/Services/Award ceremonies.png', desc: 'We design recognition events that genuinely honour achievement — from annual sales award galas and gala dinners to employee appreciation dinners and leadership felicitations.' },
+  { num: '06', title: 'CORPORATE & LUXURY TRAVEL', tag: 'TRAVEL', href: '/services/travel', img: '/assets/Services/Corporate Luxury Travel.png', desc: 'From seamless business travel to bespoke group getaways, Zovent manages every journey with precision, comfort and care. We curate corporate travel, incentive trips, luxury holidays and group travel experiences across India and international destinations — tailored around your people, purpose and preferences.' },
 ]
 
 const stats = [
@@ -62,11 +64,7 @@ const testimonials = [
   { quote: 'Their attention to detail and enterprise-grade project management gave us complete confidence.', name: 'Ritesh Mehta', title: 'Director – Corporate Affairs', co: 'SteelMark Group' },
 ]
 
-const blogPosts = [
-  { slug: 'conference-trends-2025', cat: 'EVENT PLANNING', date: 'Jul 28 2025', title: '7 Trends Reshaping Corporate Conferences in 2025', img: 'https://images.unsplash.com/photo-1472146936668-d987bf0a6e38?w=600&h=400&fit=crop&auto=format' },
-  { slug: 'incentive-travel-roi', cat: 'CORPORATE CULTURE', date: 'Jun 14 2025', title: 'Why Incentive Travel Still Delivers the Highest ROI', img: EV5 },
-  { slug: 'southeast-asia-corporate-travel', cat: 'TRAVEL', date: 'May 30 2025', title: 'Southeast Asia for Corporate Groups: A Planning Guide', img: EV2 },
-]
+const blogPosts = blogPostsData.slice(0, 3).map(p => ({ slug: p.slug, cat: p.category, date: p.date, title: p.title, img: p.img }))
 
 // ── Scroll-reveal wrapper ──────────────────────────────────────────────────
 function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) {
@@ -318,34 +316,32 @@ export default function Home() {
           </Reveal>
         </div>
 
-        {/* Alternating full-bleed rows */}
+        {/* Alternating text rows — no imagery */}
         {services.map((s, idx) => {
           const imgRight = idx % 2 === 0
-          const rowBg = idx % 2 === 0 ? '#FAF8F2' : '#FAF8F2'
           return (
             <Link
               key={s.num}
               to={s.href}
               className="group block relative overflow-hidden"
-              style={{ minHeight: '62vh', borderTop: '1px solid rgba(103,6,38,0.1)', backgroundColor: rowBg }}
+              style={{ minHeight: '62vh', borderTop: '1px solid rgba(103,6,38,0.1)', backgroundColor: '#FAF8F2' }}
             >
-              {/* Full-bleed image panel */}
+              {/* Full-bleed service image panel */}
               <div
                 className="absolute inset-y-0 transition-all duration-700"
-                style={{ [imgRight ? 'right' : 'left']: 0, width: '55%' }}
+                style={{ [imgRight ? 'right' : 'left']: 0, width: '55%', backgroundColor: '#F2E6EA' }}
               >
                 <img
-                  src={s.img}
+                  src={encodeURI(s.img)}
                   alt={s.title}
-                  className="w-full h-full object-cover transition-all duration-700 opacity-30 group-hover:opacity-100 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-all duration-700 opacity-70 group-hover:opacity-100 group-hover:scale-105"
                 />
-                {/* Direction gradient — fades out on hover */}
                 <div
                   className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-0"
                   style={{
                     background: imgRight
-                      ? `linear-gradient(to right, ${rowBg} 0%, ${rowBg}b3 40%, ${rowBg}1a 100%)`
-                      : `linear-gradient(to left, ${rowBg} 0%, ${rowBg}b3 40%, ${rowBg}1a 100%)`,
+                      ? 'linear-gradient(to right, #FAF8F2 0%, #FAF8F2b3 25%, #FAF8F200 100%)'
+                      : 'linear-gradient(to left, #FAF8F2 0%, #FAF8F2b3 25%, #FAF8F200 100%)',
                   }}
                 />
               </div>
@@ -358,7 +354,7 @@ export default function Home() {
                   fontSize: 'clamp(140px, 18vw, 240px)',
                   color: 'rgba(26,10,14,0.04)',
                   lineHeight: 1,
-                  [imgRight ? 'right' : 'left']: '5%',
+                  [imgRight ? 'left' : 'right']: '5%',
                   bottom: '-0.1em',
                 }}
               >
@@ -367,7 +363,7 @@ export default function Home() {
 
               {/* Text content */}
               <div
-                className="relative z-10 flex flex-col justify-center h-full px-10 lg:px-20 py-20"
+                className="relative z-10 flex flex-col justify-center px-10 lg:px-20 py-16"
                 style={{
                   width: 'min(52%, 600px)',
                   marginLeft: imgRight ? 0 : 'auto',

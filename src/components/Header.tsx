@@ -29,6 +29,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [soundOn, setSoundOn] = useState(false)
+  const [servicesOpen, setServicesOpen] = useState(false)
   const location = useLocation()
 
   useEffect(() => {
@@ -67,21 +68,84 @@ export default function Header() {
 
           {/* Desktop links — center */}
           <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-            {navLinks.map(({ label, href }) => (
-              <Link
-                key={href}
-                to={href}
-                className="text-[11px] tracking-[0.18em] font-medium uppercase transition-colors"
-                style={{
-                  fontFamily: L,
-                  color: isActive(href, location.pathname) ? '#670626' : 'rgba(247, 243, 246, 1)',
-                }}
-              // onMouseEnter={e => { if (!isActive(href, location.pathname)) (e.currentTarget as HTMLElement).style.color = '#1A0A0E' }}
-              // onMouseLeave={e => { if (!isActive(href, location.pathname)) (e.currentTarget as HTMLElement).style.color = 'rgba(26,10,22,0.55)' }}
-              >
-                {label}
-              </Link>
-            ))}
+            {navLinks.map(({ label, href }) => {
+              const linkColor = isActive(href, location.pathname)
+                ? '#670626'
+                : scrolled ? 'rgba(26,10,22,0.55)' : 'rgba(247, 243, 246, 1)'
+
+              if (label === 'SERVICES') {
+                return (
+                  <div
+                    key={href}
+                    className="relative"
+                    onMouseEnter={() => setServicesOpen(true)}
+                    onMouseLeave={() => setServicesOpen(false)}
+                  >
+                    <Link
+                      to={href}
+                      className="flex items-center gap-1.5 text-[11px] tracking-[0.18em] font-medium uppercase transition-colors"
+                      style={{ fontFamily: L, color: linkColor }}
+                    >
+                      {label}
+                      <span
+                        className="transition-transform duration-200"
+                        style={{ fontSize: '8px', transform: servicesOpen ? 'rotate(180deg)' : 'none' }}
+                      >
+                        ▾
+                      </span>
+                    </Link>
+
+                    <div
+                      className="absolute left-1/2 -translate-x-1/2 pt-4 transition-all duration-200"
+                      style={{
+                        top: '100%',
+                        opacity: servicesOpen ? 1 : 0,
+                        visibility: servicesOpen ? 'visible' : 'hidden',
+                        transform: servicesOpen ? 'translate(-50%,0)' : 'translate(-50%,-6px)',
+                      }}
+                    >
+                      <div
+                        className="flex flex-col py-2"
+                        style={{
+                          minWidth: '260px',
+                          backgroundColor: '#FAF8F2',
+                          border: '1px solid rgba(103,6,38,0.12)',
+                          boxShadow: '0 16px 40px rgba(26,10,14,0.14)',
+                        }}
+                      >
+                        {serviceLinks.map((s, i) => (
+                          <Link
+                            key={s.id}
+                            to={`/services/${s.id}`}
+                            className="px-5 py-3 text-[11px] tracking-[0.1em] uppercase transition-colors"
+                            style={{
+                              fontFamily: L,
+                              color: '#1A0A0E',
+                              borderBottom: i < serviceLinks.length - 1 ? '1px solid rgba(103,6,38,0.08)' : 'none',
+                            }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#F2E6EA'; (e.currentTarget as HTMLElement).style.color = '#670626' }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#1A0A0E' }}
+                          >
+                            {s.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+
+              return (
+                <Link
+                  key={href}
+                  to={href}
+                  className="text-[11px] tracking-[0.18em] font-medium uppercase transition-colors"
+                  style={{ fontFamily: L, color: linkColor }}
+                >
+                  {label}
+                </Link>
+              )
+            })}
           </nav>
 
           {/* Right */}
@@ -158,7 +222,7 @@ export default function Header() {
           {serviceLinks.map(s => (
             <Link
               key={s.id}
-              to={`/services#${s.id}`}
+              to={`/services/${s.id}`}
               className="text-[10px] tracking-[0.15em] uppercase py-1 px-3 border"
               style={{ borderColor: 'rgba(103,6,38,0.15)', color: 'rgba(26,10,22,0.45)', fontFamily: L }}
             >

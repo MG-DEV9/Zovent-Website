@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
+import { posts as allPosts } from '../data/blog'
 
 const D = "'Cormorant Garamond', Georgia, serif"
 const L = "'Manrope', system-ui, sans-serif"
@@ -7,18 +8,8 @@ const B = "Georgia, 'Times New Roman', serif"
 
 const BLOG_BG = 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1800&h=900&fit=crop&auto=format'
 
-const allPosts = [
-  { slug: 'conference-trends-2025', title: '7 Trends Reshaping Corporate Conferences in 2025', excerpt: 'Hybrid formats, experiential design, and sustainability are no longer optional — they\'re the new baseline for enterprise events.', category: 'EVENT PLANNING', date: 'Jul 28 2025', author: 'Priya Mehta', readTime: '6 min', img: 'https://images.unsplash.com/photo-1472146936668-d987bf0a6e38?w=800&h=520&fit=crop&auto=format', featured: true },
-  { slug: 'incentive-travel-roi', title: 'Why Incentive Travel Still Delivers the Highest ROI', excerpt: 'Studies consistently show that well-designed incentive programmes outperform cash bonuses for long-term motivation and retention.', category: 'CORPORATE CULTURE', date: 'Jun 14 2025', author: 'Rohit Sinha', readTime: '5 min', img: 'https://images.unsplash.com/photo-1770140304098-46700a5c45c8?w=800&h=520&fit=crop&auto=format', featured: false },
-  { slug: 'southeast-asia-corporate-travel', title: 'Southeast Asia for Corporate Groups: A Planning Guide', excerpt: 'Balancing culture, logistics, and budget for multi-city corporate travel itineraries across the region.', category: 'TRAVEL', date: 'May 30 2025', author: 'Rohit Sinha', readTime: '8 min', img: 'https://images.unsplash.com/photo-1770770155448-8461474b4e7a?w=800&h=520&fit=crop&auto=format', featured: false },
-  { slug: 'hybrid-event-tech-stack', title: 'Building the Right Tech Stack for Hybrid Events', excerpt: 'From registration platforms to live streaming tools — what actually works and what\'s just vendor noise.', category: 'EVENT PLANNING', date: 'Apr 22 2025', author: 'Priya Mehta', readTime: '7 min', img: 'https://images.unsplash.com/photo-1785336872226-06bf32ebd7fd?w=800&h=520&fit=crop&auto=format', featured: false },
-  { slug: 'awards-programme-design', title: 'How to Design an Awards Programme Your Team Will Actually Value', excerpt: 'Most corporate recognition programmes feel hollow because they\'re designed for efficiency, not emotion.', category: 'CORPORATE CULTURE', date: 'Mar 10 2025', author: 'Sneha Rao', readTime: '6 min', img: 'https://images.unsplash.com/photo-1770140304066-6db58fe18543?w=800&h=520&fit=crop&auto=format', featured: false },
-  { slug: 'goa-corporate-retreats', title: 'Goa Beyond the Beach: Planning a Meaningful Corporate Retreat', excerpt: 'Why the best corporate retreats in Goa happen nowhere near the beach — and how to structure time for both productivity and play.', category: 'TRAVEL', date: 'Feb 18 2025', author: 'Arjun Kapoor', readTime: '5 min', img: 'https://images.unsplash.com/photo-1742844552048-410dfdf7b3c7?w=800&h=520&fit=crop&auto=format', featured: false },
-]
-
-const categories = ['ALL', 'EVENT PLANNING', 'TRAVEL', 'CORPORATE CULTURE', 'INDUSTRY TRENDS']
-
 export default function Blog() {
+  const categories = useMemo(() => ['ALL', ...Array.from(new Set(allPosts.map(p => p.category)))], [])
   const [activeCat, setActiveCat] = useState('ALL')
   const filtered = activeCat === 'ALL' ? allPosts : allPosts.filter(p => p.category === activeCat)
   const featured = filtered.find(p => p.featured) || filtered[0]
@@ -33,7 +24,7 @@ export default function Blog() {
         style={{ minHeight: '55vh', paddingTop: '68px', backgroundColor: '#670626', borderBottom: '1px solid rgba(103,6,38,0.1)' }}
       >
         <img
-          src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1800&h=900&fit=crop&auto=format"
+          src={BLOG_BG}
           alt=""
           aria-hidden
           className="absolute inset-0 w-full h-full object-cover"

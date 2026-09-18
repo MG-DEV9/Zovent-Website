@@ -3,6 +3,7 @@ import Root from './layouts/Root'
 import Home from './pages/Home'
 import About from './pages/About'
 import Services from './pages/Services'
+import ServiceDetail from './pages/ServiceDetail'
 import Blog from './pages/Blog'
 import BlogPost from './pages/BlogPost'
 import Gallery from './pages/Gallery'
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
       { index: true, Component: Home },
       { path: 'about', Component: About },
       { path: 'services', Component: Services },
+      { path: 'services/:id', Component: ServiceDetail },
       { path: 'blog', Component: Blog },
       { path: 'blog/:slug', Component: BlogPost },
       { path: 'gallery', Component: Gallery },
