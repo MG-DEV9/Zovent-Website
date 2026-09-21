@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
-import { api } from '../lib/api'
+import { api, assetUrl } from '../lib/api'
 import { loadRazorpay, type RazorpayInstance, type RazorpayOptions, type RazorpayFailedResponse } from '../lib/razorpay'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -26,12 +26,14 @@ type PaymentRecord = {
   paidAmount?: number
   remainingAmount?: number
   installments?: Installment[]
+  invoiceUrl?: string
+  invoiceFileName?: string
 }
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
-const D    = "'Cormorant Garamond', Georgia, serif"
+const D    = "'Times New Roman', Times New Roman, serif"
 const SANS = "'Manrope', system-ui, sans-serif"
-const BODY = "Georgia, 'Times New Roman', serif"
+const BODY = "Times New Roman, 'Times New Roman', Times New Roman"
 const RED  = '#670626'
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -171,7 +173,13 @@ export default function Payment() {
         order_id:    order.orderId,
         prefill:     { name: client.name, email: client.email, contact: client.phone },
         theme:       { color: RED },
-        modal:       { escape: false },
+        modal:       {
+          escape: false,
+          ondismiss: () => {
+            setPaying(false)
+            setError('Payment was cancelled. You can try again when ready.')
+          },
+        },
         handler: async (response) => {
           try {
             await api.verifyPayment({
@@ -183,9 +191,10 @@ export default function Payment() {
             setPaying(false)
             setSuccess(`Payment successful${instLabel ? ` for ${instLabel}` : ''}! ID: ${response.razorpay_payment_id}. Thank you!`)
             fetchPayment(payment.paymentId)
-          } catch {
+          } catch (err: unknown) {
             setPaying(false)
-            setError('Payment was received but verification failed. Please contact us with your payment ID.')
+            const detail = err instanceof Error ? err.message : 'Unknown verification error.'
+            setError(`Payment was received but could not be verified: ${detail}`)
           }
         },
       })
@@ -365,12 +374,25 @@ export default function Payment() {
                         {payment.paymentId}
                       </h2>
                     </div>
-                    <span
-                      className="px-3 py-1 text-[9px] uppercase tracking-widest font-bold"
-                      style={{ backgroundColor: statusColors[payment.status].bg, color: statusColors[payment.status].text }}
-                    >
-                      {payment.status}
-                    </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <span
+                        className="px-3 py-1 text-[9px] uppercase tracking-widest font-bold"
+                        style={{ backgroundColor: statusColors[payment.status].bg, color: statusColors[payment.status].text }}
+                      >
+                        {payment.status}
+                      </span>
+                      {payment.invoiceUrl && (
+                        <a
+                          href={assetUrl(payment.invoiceUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] tracking-[0.1em] uppercase font-semibold underline"
+                          style={{ color: RED, fontFamily: SANS }}
+                        >
+                          View Invoice ↗
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   {/* Client / Service / Description */}

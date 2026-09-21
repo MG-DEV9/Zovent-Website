@@ -7,6 +7,7 @@ const installmentSchema = new mongoose.Schema(
     dueDate: { type: Date,   required: true },
     status:  { type: String, default: 'Pending', enum: ['Pending', 'Paid'] },
     paidOn:  { type: Date },
+    razorpayPaymentId: { type: String, default: '' },
   },
   { _id: true }
 );
@@ -42,6 +43,13 @@ const paymentSchema = new mongoose.Schema(
 
     // Sum of paid installment amounts (updated on each installment pay)
     paidAmount:  { type: Number, default: 0 },
+
+    // Razorpay payment ID for the transaction that settled this payment (no-installment case)
+    razorpayPaymentId: { type: String, default: '' },
+
+    // ── Invoice ────────────────────────────────────────────────────────────────
+    invoiceUrl:      { type: String, default: '' },
+    invoiceFileName: { type: String, default: '' },
 
     // ── Installments ───────────────────────────────────────────────────────────
     installments: { type: [installmentSchema], default: [] },

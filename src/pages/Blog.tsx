@@ -31,7 +31,7 @@ export default function Blog() {
           style={{ opacity: 0.15, mixBlendMode: 'luminosity' }}
         />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #670626 30%, rgba(103,6,38,0.72) 65%, rgba(103,6,38,0.3) 100%)' }} />
-        <div className="relative z-10 max-w-[1440px] mx-auto pb-16 w-full">
+        <div className="relative z-10 max-w-360 mx-auto pb-16 w-full">
           <p className="text-[11px] tracking-[0.22em] uppercase mb-5" style={{ color: 'rgba(250,248,242,0.7)', fontFamily: L }}>[ INSIGHTS &amp; IDEAS ]</p>
           <h1 className="font-black uppercase leading-none" style={{ fontFamily: D, fontSize: 'clamp(56px, 10vw, 128px)', color: '#FAF8F2' }}>
             THE BLOG.
@@ -41,12 +41,12 @@ export default function Blog() {
 
       {/* ── FILTER ── */}
       <div style={{ backgroundColor: '#F2E6EA', borderBottom: '1px solid rgba(103,6,38,0.1)' }}>
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-12 flex overflow-x-auto gap-8 py-5">
+        <div className="max-w-360 mx-auto px-6 lg:px-12 flex overflow-x-auto gap-8 py-5">
           {categories.map(cat => (
             <button
               key={cat}
               onClick={() => setActiveCat(cat)}
-              className="flex-shrink-0 text-[10px] tracking-[0.18em] uppercase font-medium border-b-2 pb-1 transition-all"
+              className="shrink-0 text-[10px] tracking-[0.18em] uppercase font-medium border-b-2 pb-1 transition-all"
               style={{ borderColor: activeCat === cat ? '#670626' : 'transparent', color: activeCat === cat ? '#670626' : 'rgba(26,10,14,0.4)', fontFamily: L, background: 'none' }}
             >
               {cat}
@@ -58,7 +58,7 @@ export default function Blog() {
       {/* ── FEATURED ── */}
       {featured && (
         <section className="py-16 px-6 lg:px-12" style={{ borderBottom: '1px solid rgba(103,6,38,0.1)' }}>
-          <div className="max-w-[1440px] mx-auto">
+          <div className="max-w-360 mx-auto">
             <Link to={`/blog/${featured.slug}`} className="group grid lg:grid-cols-2 gap-10 items-center">
               <div className="overflow-hidden" style={{ aspectRatio: '16/10', backgroundColor: '#F2E6EA' }}>
                 <img src={featured.img} alt={featured.title} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />

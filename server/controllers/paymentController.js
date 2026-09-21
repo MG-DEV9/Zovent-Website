@@ -22,9 +22,12 @@ const syncStatus = (payment) => {
 
 exports.getPaymentById = async (req, res) => {
   const p = await Payment.findOne({ paymentId: req.params.paymentId.toUpperCase() });
-  if (!p)                               return res.status(404).json({ message: 'Payment reference not found.' });
-  if (p.status === 'Paid')              return res.status(400).json({ message: 'This payment has already been settled.' });
-  if (new Date(p.dueDate) < new Date()) return res.status(410).json({ message: 'This payment link has expired. Please contact the SAY Experiences team.' });
+  if (!p) return res.status(404).json({ message: 'Payment reference not found.' });
+  // A fully-paid record stays viewable (e.g. to view/download the invoice) — only
+  // an unpaid, past-due link is blocked.
+  if (p.status !== 'Paid' && new Date(p.dueDate) < new Date()) {
+    return res.status(410).json({ message: 'This payment link has expired. Please contact the SAY Experiences team.' });
+  }
   res.json(p);
 };
 
@@ -70,6 +73,24 @@ exports.updatePayment = async (req, res) => {
   const p = await Payment.findOneAndUpdate(filter, body, {
     new: true, runValidators: true,
   });
+  if (!p) return res.status(404).json({ message: 'Not found.' });
+  res.json(p);
+};
+
+// ─── Admin — upload invoice file ───────────────────────────────────────────────
+
+exports.uploadInvoice = async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
+
+  const filter = req.params.id.match(/^[0-9a-fA-F]{24}$/)
+    ? { _id: req.params.id }
+    : { paymentId: req.params.id.toUpperCase() };
+
+  const p = await Payment.findOneAndUpdate(
+    filter,
+    { invoiceUrl: `/uploads/invoices/${req.file.filename}`, invoiceFileName: req.file.originalname },
+    { new: true }
+  );
   if (!p) return res.status(404).json({ message: 'Not found.' });
   res.json(p);
 };

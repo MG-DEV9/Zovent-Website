@@ -97,7 +97,7 @@ export default function About() {
           style={{ opacity: 0.18, mixBlendMode: 'luminosity' }}
         />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #670626 30%, rgba(103,6,38,0.7) 65%, rgba(103,6,38,0.3) 100%)' }} />
-        <div className="relative z-10 max-w-[1440px] mx-auto pb-16 w-full">
+        <div className="relative z-10 max-w-360 mx-auto pb-16 w-full">
           <p
             className="text-[11px] tracking-[0.22em] uppercase mb-5"
             style={{ color: 'rgba(186,215,151,0.75)', fontFamily: B }}
@@ -125,7 +125,7 @@ export default function About() {
         <div className="marquee-track flex gap-12 w-max whitespace-nowrap">
           {[...Array(3)].flatMap(() =>
             ['SMART THINKING', 'SEAMLESS EXECUTION', 'MEMORABLE EXPERIENCES', 'REAL IMPACT'].map((t, i) => (
-              <span key={`${t}-${i}`} className="flex items-center gap-12 flex-shrink-0">
+              <span key={`${t}-${i}`} className="flex items-center gap-12 shrink-0">
                 <span className="text-[15px] tracking-[0.22em] uppercase font-medium" style={{ color: '#670626', fontFamily: B }}>{t}</span>
                 <span style={{ color: '#670626', fontSize: '10px' }}>◆</span>
               </span>
@@ -184,7 +184,7 @@ export default function About() {
         >
           IDEAS
         </span>
-        <div className="max-w-[1440px] mx-auto">
+        <div className="max-w-360 mx-auto">
           <Reveal>
             <p className="text-[10px] tracking-[0.28em] uppercase mb-14" style={{ color: '#BAD797', fontFamily: B }}>[ OUR MISSION ]</p>
           </Reveal>

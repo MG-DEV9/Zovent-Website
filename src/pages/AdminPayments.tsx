@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react'
-import { api, clearAdminSession } from '../lib/api'
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { api, clearAdminSession, assetUrl } from '../lib/api'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Installment = {
@@ -8,6 +8,7 @@ type Installment = {
   dueDate: string
   status: 'Pending' | 'Paid'
   paidOn?: string
+  razorpayPaymentId?: string
 }
 
 type PaymentRecord = {
@@ -27,6 +28,9 @@ type PaymentRecord = {
   remainingAmount?: number
   installments?: Installment[]
   lastPaidAt?: string
+  razorpayPaymentId?: string
+  invoiceUrl?: string
+  invoiceFileName?: string
 }
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
@@ -52,6 +56,9 @@ const blankForm = (): Omit<PaymentRecord, 'status'> & { status: string } => ({
   paidAmount: 0, remainingAmount: 0, installments: [],
 })
 
+const txnId = (p: PaymentRecord) =>
+  p.razorpayPaymentId || p.installments?.slice().reverse().find(i => i.razorpayPaymentId)?.razorpayPaymentId || ''
+
 const statusColor = (s: string) => ({
   Paid:    { bg: '#dcfce7', text: '#15803d' },
   Partial: { bg: '#dbeafe', text: '#1d4ed8' },
@@ -60,6 +67,9 @@ const statusColor = (s: string) => ({
 
 // ── Input style ────────────────────────────────────────────────────────────────
 const inp = 'w-full px-3 py-2 text-sm border outline-none transition-colors bg-[#FAF8F2] border-[rgba(103,6,38,0.2)] text-[#1A0A0E] focus:border-[#670626]'
+
+// ── Row actions dropdown item style ─────────────────────────────────────────────
+const menuItemCls = 'block w-full text-left px-4 py-2 text-[11px] tracking-wide transition-colors hover:bg-[#F2E6EA]'
 
 // ────────────────────────────────────────────────────────────────────────────────
 export default function AdminPayments() {
@@ -76,6 +86,12 @@ export default function AdminPayments() {
   const [editId, setEditId]         = useState<string | null>(null)
   const [form, setForm]             = useState(blankForm())
   const [instForm, setInstForm]     = useState<Installment[]>([])
+
+  // Row actions menu + invoice upload
+  const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null)
+  const [uploadingFor, setUploadingFor] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const uploadTargetRef = useRef<string | null>(null)
 
   // Dashboard stats
   const stats = {
@@ -181,6 +197,30 @@ export default function AdminPayments() {
     setTimeout(() => setSuccess(''), 3000)
   }
 
+  // ── Invoice upload ────────────────────────────────────────────────────────
+  const triggerInvoiceUpload = (id: string) => {
+    uploadTargetRef.current = id
+    fileInputRef.current?.click()
+  }
+
+  const handleInvoiceFileChosen = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    const id = uploadTargetRef.current
+    e.target.value = ''
+    if (!file || !id) return
+
+    setUploadingFor(id); setError(''); setSuccess('')
+    try {
+      await api.uploadInvoice(id, file)
+      setSuccess(`Invoice uploaded for "${id}".`)
+      fetchPayments()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload invoice.')
+    } finally {
+      setUploadingFor(null)
+    }
+  }
+
   // ── Installment helpers ────────────────────────────────────────────────────
   const addInstallment = () => setInstForm(prev => [...prev, { label: `Installment ${prev.length + 1}`, amount: 0, dueDate: form.dueDate, status: 'Pending' }])
   const updateInst = (idx: number, field: keyof Installment, value: string | number) => {
@@ -196,7 +236,7 @@ export default function AdminPayments() {
   })
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FAF8F2', fontFamily: SANS }}>
+    <div className="admin-shell min-h-screen" style={{ backgroundColor: '#FAF8F2', fontFamily: SANS }}>
       {/* ── Top bar ── */}
       <header className="sticky top-0 z-40 px-6 flex items-center justify-between h-14" style={{ backgroundColor: '#1A0A0E', borderBottom: '1px solid rgba(103,6,38,0.3)' }}>
         <div className="flex items-center gap-4">
@@ -224,7 +264,7 @@ export default function AdminPayments() {
         </div>
       </header>
 
-      <div className="max-w-[1400px] mx-auto px-6 py-10">
+      <div className="max-w-350 mx-auto px-6 py-10">
 
         {/* ── Alerts ── */}
         {error && <div className="mb-4 px-4 py-3 text-sm border" style={{ backgroundColor: '#fef2f2', borderColor: '#fca5a5', color: '#991b1b' }}>{error} <button onClick={() => setError('')} className="ml-2 opacity-60">✕</button></div>}
@@ -304,7 +344,7 @@ export default function AdminPayments() {
                 <input className={inp} type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} />
               </div>
               <div className="flex items-center gap-3">
-                <input type="checkbox" id="gst" checked={!!form.gstApplicable} onChange={e => setForm(f => ({ ...f, gstApplicable: e.target.checked }))} className="accent-[#670626]" />
+                <input type="checkbox" id="gst" checked={!!form.gstApplicable} onChange={e => setForm(f => ({ ...f, gstApplicable: e.target.checked }))} className="accent-cherry" />
                 <label htmlFor="gst" className="text-[11px] uppercase tracking-wide" style={{ color: 'rgba(26,10,14,0.7)' }}>Apply GST</label>
                 {form.gstApplicable && (
                   <input className={`${inp} w-24`} type="number" value={form.gstRate || 18} onChange={e => setForm(f => ({ ...f, gstRate: Number(e.target.value) }))} placeholder="18" />
@@ -438,36 +478,70 @@ export default function AdminPayments() {
                       <span className="px-2 py-1 text-[9px] uppercase tracking-widest font-bold" style={{ backgroundColor: statusColor(p.status).bg, color: statusColor(p.status).text }}>
                         {p.status}
                       </span>
+                      {txnId(p) && (
+                        <p
+                          className="mt-1.5 text-[10px] font-mono cursor-pointer hover:underline"
+                          style={{ color: 'rgba(26,10,14,0.4)' }}
+                          title="Click to copy Razorpay payment ID"
+                          onClick={() => { navigator.clipboard.writeText(txnId(p)); setSuccess(`Transaction ID copied: ${txnId(p)}`); setTimeout(() => setSuccess(''), 3000) }}
+                        >
+                          {txnId(p)}
+                        </p>
+                      )}
                     </td>
-                    <td className="px-3 py-3">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <button onClick={() => copyLink(p.paymentId)} title="Copy payment link" className="text-[10px] px-2 py-1 transition-colors" style={{ border: '1px solid rgba(103,6,38,0.2)', color: RED }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#F2E6EA' }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
-                        >
-                          Copy Link
-                        </button>
-                        <button onClick={() => openEdit(p)} className="text-[10px] px-2 py-1 transition-colors" style={{ border: '1px solid rgba(103,6,38,0.2)', color: '#1A0A0E' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#F2E6EA' }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
-                        >
-                          Edit
-                        </button>
-                        {p.status !== 'Paid' && (
-                          <button onClick={() => markPaid(p)} className="text-[10px] px-2 py-1 transition-colors" style={{ border: '1px solid #15803d', color: '#15803d' }}
-                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#f0fdf4' }}
-                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
+                    <td className="px-3 py-3 relative">
+                      <button
+                        onClick={() => setMenuOpenFor(menuOpenFor === p.paymentId ? null : p.paymentId)}
+                        title="Actions"
+                        className="w-8 h-8 flex items-center justify-center text-lg leading-none transition-colors"
+                        style={{ border: '1px solid rgba(103,6,38,0.2)', color: '#1A0A0E' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#F2E6EA' }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
+                      >
+                        ⋮
+                      </button>
+
+                      {menuOpenFor === p.paymentId && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
+                          <div
+                            className="absolute right-3 top-full mt-1 z-20 py-1"
+                            style={{ backgroundColor: '#fff', border: '1px solid rgba(103,6,38,0.15)', boxShadow: '0 8px 24px rgba(26,10,14,0.14)', minWidth: '180px' }}
                           >
-                            Mark Paid
-                          </button>
-                        )}
-                        <button onClick={() => handleDelete(p.paymentId)} className="text-[10px] px-2 py-1 transition-colors" style={{ border: '1px solid #fca5a5', color: '#dc2626' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#fef2f2' }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
-                        >
-                          Delete
-                        </button>
-                      </div>
+                            <button onClick={() => { copyLink(p.paymentId); setMenuOpenFor(null) }} className={menuItemCls}>
+                              Copy Link
+                            </button>
+                            <button onClick={() => { openEdit(p); setMenuOpenFor(null) }} className={menuItemCls}>
+                              Edit
+                            </button>
+                            {p.status !== 'Paid' && (
+                              <button onClick={() => { markPaid(p); setMenuOpenFor(null) }} className={menuItemCls} style={{ color: '#15803d' }}>
+                                Mark Paid
+                              </button>
+                            )}
+                            <button
+                              onClick={() => { triggerInvoiceUpload(p.paymentId); setMenuOpenFor(null) }}
+                              disabled={uploadingFor === p.paymentId}
+                              className={`${menuItemCls} disabled:opacity-50`}
+                            >
+                              {uploadingFor === p.paymentId ? 'Uploading…' : p.invoiceUrl ? 'Replace Invoice' : 'Upload Invoice'}
+                            </button>
+                            {p.invoiceUrl && (
+                              <a
+                                href={assetUrl(p.invoiceUrl)}
+                                target="_blank" rel="noopener noreferrer"
+                                onClick={() => setMenuOpenFor(null)}
+                                className={menuItemCls}
+                              >
+                                View Invoice
+                              </a>
+                            )}
+                            <button onClick={() => { handleDelete(p.paymentId); setMenuOpenFor(null) }} className={menuItemCls} style={{ color: '#dc2626' }}>
+                              Delete
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -479,6 +553,14 @@ export default function AdminPayments() {
         <p className="mt-6 text-[10px]" style={{ color: 'rgba(26,10,14,0.3)' }}>
           {filtered.length} of {payments.length} records shown
         </p>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.png,.jpg,.jpeg"
+          className="hidden"
+          onChange={handleInvoiceFileChosen}
+        />
       </div>
     </div>
   )

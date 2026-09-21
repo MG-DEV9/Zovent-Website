@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 require('dotenv').config({ path: './.env' });
 const Payment = require('./models/Payment');
 
+const connectDB = require('./config/db');
+
 async function run() {
-  await mongoose.connect(process.env.MONGO_URI || process.env.MONGO_URI_LOCAL || 'mongodb://127.0.0.1:27017/say_payment');
-  
+  await connectDB();
   // Clean up if it exists
   await Payment.deleteOne({ paymentId: 'SAY-MICE-001' });
 
@@ -14,6 +15,7 @@ async function run() {
     service: 'MICE',
     description: 'Test Gateway Payment',
     baseAmount: 100,
+    totalAmount: 100,
     dueDate: new Date(Date.now() + 86400000),
     status: 'Pending',
     gstApplicable: true,

@@ -102,3 +102,6 @@ html { scrollbar-width: thin; scrollbar-color: #BAD797 #FAF8F2; }
 @media (hover: none) {
   :root { cursor: auto; }
 }
+
+/* admin dashboard has no custom-cursor overlay (renders outside the public Root layout) */
+.admin-shell { cursor: auto; }

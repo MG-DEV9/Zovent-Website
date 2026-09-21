@@ -1,5 +1,5 @@
 const errorHandler = (err, _req, res, _next) => {
-  console.error('[SAY Payment Error]', err.stack);
+  console.error('[SAY Payment Error]', err);
 
   if (
     err.message?.includes('SSL routines') ||

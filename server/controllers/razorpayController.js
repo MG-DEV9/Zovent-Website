@@ -39,8 +39,6 @@ const syncStatus = (payment) => {
 exports.createOrder = async (req, res) => {
   const {
     paymentId,
-    amount,
-    gstApplied,
     clientName,
     clientEmail,
     clientPhone,
@@ -48,10 +46,8 @@ exports.createOrder = async (req, res) => {
     installmentIdx,   // optional – index into payment.installments[]
   } = req.body;
 
-  // Validate amount (Razorpay minimum is ₹1 = 100 paise)
-  const amountPaise = Math.round(amount * 100);
-  if (!amountPaise || amountPaise < 100) {
-    return res.status(400).json({ message: 'Amount must be at least ₹1.' });
+  if (!paymentId || !clientName?.trim() || !clientPhone?.trim()) {
+    return res.status(400).json({ message: 'Payment reference, name, and phone are required.' });
   }
 
   const payment = await Payment.findOne({ paymentId });
@@ -70,25 +66,37 @@ exports.createOrder = async (req, res) => {
     }
   }
 
+  const installment = installmentIdx !== undefined && installmentIdx !== null
+    ? payment.installments[parseInt(installmentIdx, 10)]
+    : null;
+  const baseAmount = installment ? installment.amount : (payment.totalAmount || payment.baseAmount);
+  const gstRate = payment.gstRate ?? (payment.gstApplicable ? 18 : 0);
+  const fee = Math.round(baseAmount * 0.02);
+  const gst = gstRate > 0 ? Math.round((baseAmount + fee) * (gstRate / 100)) : 0;
+  const amount = baseAmount + fee + gst;
+  const amountPaise = Math.round(amount * 100);
+  if (amountPaise < 100) return res.status(400).json({ message: 'Amount must be at least ₹1.' });
+
   const razorpay = getRazorpay();
 
   const order = await razorpay.orders.create({
     amount:   amountPaise,
     currency: 'INR',
-    receipt:  `rcpt_${paymentId}_${Date.now()}`,
+    receipt:  `rcpt_${payment._id.toString().slice(-12)}_${Date.now().toString().slice(-8)}`,
     notes: {
       paymentId,
       clientName,
-      gstApplied:     String(gstApplied),
+      gstApplied:     String(gstRate > 0),
       installmentIdx: installmentIdx !== undefined ? String(installmentIdx) : '',
     },
   });
 
+  const normalizedEmail = clientEmail?.trim().toLowerCase() || '';
   const customer = await Customer.findOneAndUpdate(
-    { email: clientEmail.toLowerCase(), phone: clientPhone },
+    { email: normalizedEmail, phone: clientPhone },
     {
       name:          clientName,
-      email:         clientEmail,
+      email:         normalizedEmail,
       phone:         clientPhone,
       notes:         clientMessage,
       lastPaymentId: paymentId,
@@ -101,8 +109,8 @@ exports.createOrder = async (req, res) => {
     paymentId,
     orderId:        order.id,
     amount,
-    baseAmount:     payment.totalAmount || payment.baseAmount,
-    gstApplied,
+    baseAmount,
+    gstApplied:     gstRate > 0,
     clientName,
     clientEmail,
     clientPhone,
@@ -113,6 +121,7 @@ exports.createOrder = async (req, res) => {
 
   res.json({
     orderId:  order.id,
+    order_id: order.id,
     amount:   order.amount,
     currency: order.currency,
   });
@@ -130,9 +139,6 @@ exports.verifyPayment = async (req, res) => {
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,
-    paymentId,
-    amount,
-    installmentIdx,
   } = req.body;
 
   if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -150,38 +156,39 @@ exports.verifyPayment = async (req, res) => {
     .update(`${razorpay_order_id}|${razorpay_payment_id}`)
     .digest('hex');
 
-  if (generatedSignature !== razorpay_signature) {
+  const expected = Buffer.from(generatedSignature, 'utf8');
+  const received = Buffer.from(razorpay_signature, 'utf8');
+  if (expected.length !== received.length || !crypto.timingSafeEqual(expected, received)) {
     return res.status(400).json({ message: 'Payment verification failed: signature mismatch.' });
   }
 
-  // Mark Transaction as paid with Razorpay ID
-  await Transaction.findOneAndUpdate(
-    { orderId: razorpay_order_id },
-    { status: 'paid', razorpayPaymentId: razorpay_payment_id }
-  );
+  const transaction = await Transaction.findOne({ orderId: razorpay_order_id });
+  if (!transaction) return res.status(404).json({ message: 'Payment order not found.' });
+  if (transaction.status === 'paid') {
+    return res.json({ message: 'Payment was already verified.', razorpay_payment_id });
+  }
 
-  // Update payment record
-  const payment = await Payment.findOne({ paymentId });
+  const payment = await Payment.findOne({ paymentId: transaction.paymentId });
   if (!payment) {
     return res.status(404).json({ message: 'Payment record not found.' });
   }
 
-  const idx = installmentIdx !== undefined && installmentIdx !== null
-    ? parseInt(installmentIdx, 10)
-    : null;
-
+  const idx = transaction.installmentIdx;
   if (idx !== null && !isNaN(idx) && payment.installments && payment.installments[idx]) {
-    // Mark this specific installment as paid
     payment.installments[idx].status = 'Paid';
     payment.installments[idx].paidOn = new Date();
+    payment.installments[idx].razorpayPaymentId = razorpay_payment_id;
     syncStatus(payment);
   } else {
-    // No installments — mark whole payment as paid (legacy / simple payment)
-    payment.status    = 'Paid';
-    payment.paidAmount = parseFloat(amount);
+    payment.status = 'Paid';
+    payment.paidAmount = transaction.amount;
+    payment.razorpayPaymentId = razorpay_payment_id;
   }
 
   await payment.save();
+  transaction.status = 'paid';
+  transaction.razorpayPaymentId = razorpay_payment_id;
+  await transaction.save();
 
   res.json({ message: 'Payment verified successfully.', razorpay_payment_id });
 };

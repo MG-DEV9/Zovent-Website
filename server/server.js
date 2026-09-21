@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -16,6 +17,8 @@ app.use(cors({
 }));
 app.options('*', cors()); // Explicitly handle OPTIONS preflight requests for all endpoints
 app.use(express.json());
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 

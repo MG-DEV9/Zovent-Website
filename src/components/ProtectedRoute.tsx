@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#1A0A0E' }}>
+      <div className="admin-shell min-h-screen flex items-center justify-center" style={{ backgroundColor: '#1A0A0E' }}>
         <div className="w-5 h-5 border-2 border-[#670626] border-t-transparent rounded-full animate-spin" />
       </div>
     )

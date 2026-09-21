@@ -218,7 +218,7 @@ export default function Home() {
             WE<br />
             TURN <span style={{ color: '#BAD797', fontStyle: 'italic' }}>IDEAS</span><br />
             INTO<br />
-            <span style={{ WebkitTextStroke: '1px rgba(249, 249, 249, 1)' }}>EXPERIENCES.</span>
+            <span style={{ WebkitTextStroke: '1px rgba(249, 249, 249, 1)',color: '#BAD797'  }}>EXPERIENCES.</span>
           </h1>
 
           {/* Bottom row */}
@@ -286,8 +286,12 @@ export default function Home() {
           {stats.map(({ val, label }, i) => (
             <Reveal key={label} delay={i * 80}>
               <div
-                className="py-10 flex flex-col"
-                style={{ borderLeft: i > 0 ? '1px solid #BAD797' : undefined, paddingLeft: i > 0 ? '40px' : undefined }}
+                className={[
+                  'py-10 flex flex-col',
+                  // Divider sits to the left of each item — but only when that item
+                  // isn't the first in its row, at both the 2-col (mobile) and 4-col (desktop) grid.
+                  i % 2 === 1 ? 'border-l border-matcha pl-6 lg:pl-10' : i > 0 ? 'lg:border-l lg:border-matcha lg:pl-10' : '',
+                ].join(' ')}
               >
                 <span className="font-black leading-none mb-2" style={{ fontFamily: "'Times New Roman', Times, serif", fontSize: 'clamp(60px, 8vw, 108px)', color: '#3f0c19ff' }}>
                   {val}
@@ -618,15 +622,16 @@ export default function Home() {
       <section className="relative overflow-hidden" style={{ backgroundColor: '#670626', borderTop: '1px solid rgba(250,248,242,0.1)' }}>
         {/* Ghost ZOVENT watermark — far right */}
         <div className="absolute inset-0 flex items-end justify-end pointer-events-none select-none overflow-hidden" aria-hidden>
-          <span
-            className="font-black uppercase leading-none"
-            style={{ fontFamily: D, fontSize: 'clamp(160px, 28vw, 400px)', color: 'rgba(250,248,242,0.05)', letterSpacing: '-0.04em', lineHeight: 0.85, marginRight: '-0.05em', marginBottom: '-0.1em' }}
-          >
-            ZOVENT.
-          </span>
+        <span
+          className="absolute font-black uppercase leading-none select-none pointer-events-none"
+          aria-hidden
+          style={{ fontFamily: D, fontSize: 'clamp(100px, 22vw, 320px)', color: 'rgba(250,248,242,0.03)', letterSpacing: '-0.04em', right: '-0.03em', bottom: '-0.1em', lineHeight: 0.85 }}
+        >
+          Zovent.
+        </span>
         </div>
 
-        <div className="relative z-10 max-w-[1440px] mx-auto px-10 lg:px-20 py-40">
+        <div className="relative z-10 max-w-360 mx-auto px-10 lg:px-20 py-40">
           <Reveal>
             <p className="text-[10px] tracking-[0.28em] uppercase mb-10" style={{ color: '#FAF8F2', fontFamily: B }}>
               [ GOT A PROJECT? ]
@@ -636,7 +641,7 @@ export default function Home() {
             {/* Mixed-case layrmedia-style headline */}
             <h2 className="font-black leading-[0.88] mb-6" style={{ fontFamily: D, fontSize: 'clamp(52px, 10vw, 148px)', letterSpacing: '-0.025em', maxWidth: '1000px', color: '#FAF8F2' }}>
               Your next?{' '}
-              <span style={{ WebkitTextStroke: '1px rgba(250,248,242,0.35)', color: 'transparent' }}>
+              <span style={{ color: '#BAD797' }}>
                 {"big moment"}
               </span>{' '}
               starts here.
@@ -654,7 +659,7 @@ export default function Home() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#FAF8F2' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#FAF8F2' }}
               >
-                [ START A PROJECT ] →
+                [ GET A QUOTE ] →
               </Link>
               <a
                 href="mailto:info@zovents.com"

@@ -54,7 +54,7 @@ export default function Header() {
         }}
       >
         <div
-          className="max-w-[1440px] mx-auto px-6 lg:px-12 flex items-center justify-between"
+          className="max-w-360 mx-auto px-6 lg:px-12 flex items-center justify-between"
           style={{ height: '68px' }}
         >
           {/* Logo */}
@@ -117,7 +117,7 @@ export default function Header() {
                           <Link
                             key={s.id}
                             to={`/services/${s.id}`}
-                            className="px-5 py-3 text-[11px] tracking-[0.1em] uppercase transition-colors"
+                            className="px-5 py-3 text-[11px] tracking-widest uppercase transition-colors"
                             style={{
                               fontFamily: L,
                               color: '#1A0A0E',
@@ -164,11 +164,11 @@ export default function Header() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#670626'; (e.currentTarget as HTMLElement).style.color = '#670626' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(103,6,38,0.3)'; (e.currentTarget as HTMLElement).style.color = '#1A0A0E' }}
             >
-              [ START A PROJECT ]
+              [ GET A QUOTE ]
             </Link>
 
             <button
-              className="lg:hidden flex flex-col gap-[5px] p-1.5"
+              className="lg:hidden flex flex-col gap-1.25 p-1.5"
               onClick={() => setMenuOpen(v => !v)}
               aria-label="Menu"
             >

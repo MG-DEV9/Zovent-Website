@@ -1,7 +1,8 @@
-const router       = require('express').Router();
-const ctrl         = require('../controllers/paymentController');
-const { protect }  = require('../middleware/auth');
-const asyncHandler = require('../utils/asyncHandler');
+const router          = require('express').Router();
+const ctrl            = require('../controllers/paymentController');
+const { protect }     = require('../middleware/auth');
+const asyncHandler    = require('../utils/asyncHandler');
+const { invoiceUpload } = require('../middleware/upload');
 
 // ── Public ────────────────────────────────────────────────────────────────────
 router.get('/:paymentId',   asyncHandler(ctrl.getPaymentById));   // fetch by ref
@@ -16,5 +17,13 @@ router.delete('/:id',       protect, asyncHandler(ctrl.deletePayment));
 // Installment actions
 router.patch('/:id/installments/:idx/pay',   protect, asyncHandler(ctrl.markInstallmentPaid));
 router.patch('/:id/installments/:idx/unpay', protect, asyncHandler(ctrl.unmarkInstallment));
+
+// Invoice upload
+router.post('/:id/invoice', protect, (req, res, next) => {
+  invoiceUpload.single('invoice')(req, res, err => {
+    if (err) return res.status(400).json({ message: err.message || 'Upload failed.' });
+    next();
+  });
+}, asyncHandler(ctrl.uploadInvoice));
 
 module.exports = router;

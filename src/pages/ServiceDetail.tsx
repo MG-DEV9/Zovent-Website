@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router'
 import { services } from '../data/services'
 
@@ -7,11 +7,45 @@ const B  = "'Manrope', system-ui, sans-serif"
 const Bp = "Georgia, 'Times New Roman', serif"
 const RED = '#670626'
 
+function FaqItem({ q, a, num, open, onToggle }: { q: string; a: string; num: string; open: boolean; onToggle: () => void }) {
+  return (
+    <div style={{ borderBottom: '1px solid rgba(103,6,38,0.12)' }}>
+      <button
+        onClick={onToggle}
+        className="w-full flex items-start gap-5 py-6 text-left"
+      >
+        <span className="text-[12px] shrink-0 pt-1" style={{ color: 'rgba(26,10,14,0.3)', fontFamily: B }}>{num}</span>
+        <span
+          className="flex-1 font-black uppercase leading-snug transition-colors"
+          style={{ fontFamily: D, fontSize: 'clamp(18px, 2.2vw, 26px)', color: open ? RED : '#1A0A0E' }}
+        >
+          {q}
+        </span>
+        <span
+          className="shrink-0 flex items-center justify-center w-7 h-7 text-lg transition-transform duration-300"
+          style={{ color: RED, transform: open ? 'rotate(45deg)' : 'none' }}
+        >
+          
+        </span>
+      </button>
+      <div
+        className="overflow-hidden transition-all duration-300"
+        style={{ maxHeight: open ? '240px' : '0px' }}
+      >
+        <p className="pb-6 pl-9 pr-10 text-[14px] leading-relaxed" style={{ color: 'rgba(26,10,14,0.6)', fontFamily: Bp }}>
+          {a}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function ServiceDetail() {
   const { id } = useParams<{ id: string }>()
   const svc = services.find(s => s.id === id)
+  const [openFaq, setOpenFaq] = useState<number>(0)
 
-  useEffect(() => { window.scrollTo({ top: 0 }) }, [id])
+  useEffect(() => { window.scrollTo({ top: 0 }); setOpenFaq(0) }, [id])
 
   if (!svc) return <Navigate to="/services" replace />
 
@@ -20,115 +54,106 @@ export default function ServiceDetail() {
   return (
     <div style={{ backgroundColor: '#FAF8F2', color: '#1A0A0E', fontFamily: Bp }}>
 
-      {/* ── HERO ── */}
-      <section
-        className="relative flex flex-col justify-end px-6 lg:px-12 overflow-hidden"
-        style={{ minHeight: '52vh', paddingTop: '68px', backgroundColor: RED }}
-      >
-        <img
-          src={encodeURI(svc.img)}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: 0.35, mixBlendMode: 'luminosity' }}
-        />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #670626 30%, rgba(103,6,38,0.7) 65%, rgba(103,6,38,0.35) 100%)' }} />
-        <div className="relative z-10 max-w-[1440px] mx-auto pb-14 w-full">
+      {/* ── TOP: content + image ── */}
+      <section className="px-6 lg:px-12" style={{ paddingTop: '108px' }}>
+        <div className="max-w-[1440px] mx-auto pb-20">
           <Link
             to="/services"
-            className="inline-block text-[10px] tracking-[0.22em] uppercase mb-6"
-            style={{ color: '#BAD797', fontFamily: B }}
+            className="inline-flex items-center gap-2 text-[10px] tracking-[0.22em] uppercase mb-8"
+            style={{ color: 'rgba(26,10,14,0.4)', fontFamily: B }}
           >
-            ← [ ALL SERVICES ]
+            ← ALL SERVICES
           </Link>
-          <p className="text-[11px] tracking-[0.22em] uppercase mb-4" style={{ color: '#BAD797', fontFamily: B }}>
-            {svc.num} / {svc.title}
-          </p>
-          <h1 className="font-black uppercase leading-none" style={{ fontFamily: D, fontSize: 'clamp(36px, 6.5vw, 84px)', color: '#FAF8F2' }}>
-            {svc.pageTitle}
-          </h1>
-        </div>
-      </section>
 
-      {/* ── CONTENT ── */}
-      <section className="py-16 px-6 lg:px-12">
-        <div className="max-w-[900px] mx-auto">
-          <p className="text-[11px] tracking-[0.18em] uppercase mb-6" style={{ color: RED, fontFamily: B }}>
-            [ {svc.eyebrow} ]
-          </p>
-
-          {svc.paragraphs.map((p, i) => (
-            <p key={i} className="text-[15px] leading-relaxed mb-5" style={{ color: 'rgba(26,10,14,0.65)', fontFamily: Bp }}>
-              {p}
-            </p>
-          ))}
-
-          {svc.keywords && (
-            <div className="flex flex-wrap gap-2 mt-2 mb-10">
-              {svc.keywords.map(k => (
-                <span
-                  key={k}
-                  className="px-3 py-1.5 text-[10px] tracking-[0.1em] uppercase border"
-                  style={{ borderColor: 'rgba(103,6,38,0.2)', color: RED, fontFamily: B }}
-                >
-                  {k}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10 mb-12" style={{ borderTop: '1px solid rgba(103,6,38,0.1)', paddingTop: '2.5rem' }}>
-            {svc.features.map(f => (
-              <div key={f} className="flex gap-3 items-start">
-                <span className="flex-shrink-0 text-xs mt-0.5" style={{ color: RED }}>◆</span>
-                <span className="text-[13px]" style={{ color: 'rgba(26,10,14,0.65)', fontFamily: Bp }}>{f}</span>
-              </div>
-            ))}
-          </div>
-
-          <Link
-            to="/contact"
-            className="inline-flex items-center gap-3 px-7 py-3.5 text-[11px] tracking-[0.15em] uppercase font-semibold border transition-all"
-            style={{ borderColor: 'rgba(103,6,38,0.25)', color: '#1A0A0E', fontFamily: B }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = RED; (e.currentTarget as HTMLElement).style.borderColor = RED; (e.currentTarget as HTMLElement).style.color = '#FAF8F2' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(103,6,38,0.25)'; (e.currentTarget as HTMLElement).style.color = '#1A0A0E' }}
-          >
-            [ ENQUIRE ] →
-          </Link>
-        </div>
-      </section>
-
-      {/* ── OTHER SERVICES ── */}
-      <section className="px-6 lg:px-12 pb-20" style={{ borderTop: '1px solid rgba(103,6,38,0.1)' }}>
-        <div className="max-w-[1440px] mx-auto pt-16">
-          <p className="text-[11px] tracking-[0.22em] uppercase mb-10" style={{ color: RED, fontFamily: B }}>[ EXPLORE OTHER SERVICES ]</p>
-          <div style={{ borderTop: '1px solid rgba(103,6,38,0.1)' }}>
-            {others.map((s, i) => (
-              <Link
-                key={s.id}
-                to={`/services/${s.id}`}
-                className="group flex items-center justify-between py-7"
-                style={{ borderBottom: '1px solid rgba(103,6,38,0.1)', backgroundColor: i % 2 === 0 ? '#FAF8F2' : '#bad7979f' }}
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+            {/* LEFT: copy */}
+            <div>
+              <p className="text-[11px] tracking-[0.18em] uppercase mb-5" style={{ color: RED, fontFamily: B }}>
+                [ {svc.eyebrow} ]
+              </p>
+              <h1
+                className="font-black uppercase leading-[0.95] mb-8"
+                style={{ fontFamily: D, fontSize: 'clamp(38px, 5.5vw, 68px)', color: '#1A0A0E' }}
               >
-                <div className="flex items-center gap-6 px-1">
-                  <div className="hidden sm:block flex-shrink-0 overflow-hidden" style={{ width: '84px', height: '64px', backgroundColor: '#F2E6EA' }}>
-                    <img
-                      src={encodeURI(s.img)}
-                      alt=""
-                      className="w-full h-full object-cover opacity-75 transition-all duration-500 group-hover:opacity-100 group-hover:scale-110"
-                    />
+                {svc.pageTitle}
+              </h1>
+
+              {svc.paragraphs.map((p, i) => (
+                <p key={i} className="text-[15px] leading-relaxed mb-5 max-w-lg" style={{ color: 'rgba(26,10,14,0.6)', fontFamily: Bp }}>
+                  {p}
+                </p>
+              ))}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 my-8">
+                {svc.features.map(f => (
+                  <div key={f} className="flex gap-3 items-start">
+                    <span className="shrink-0 text-xs mt-1" style={{ color: RED }}>◆</span>
+                    <span className="text-[13px] leading-relaxed" style={{ color: 'rgba(26,10,14,0.65)', fontFamily: Bp }}>{f}</span>
                   </div>
-                  <span className="text-[11px] flex-shrink-0" style={{ color: 'rgba(26,10,14,0.25)', fontFamily: B }}>{s.num} /</span>
-                  <span className="font-black uppercase leading-none" style={{ fontFamily: D, fontSize: 'clamp(22px, 3.2vw, 42px)', color: '#1A0A0E' }}>
-                    {s.title}
-                  </span>
+                ))}
+              </div>
+
+              {svc.keywords && (
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {svc.keywords.map(k => (
+                    <span
+                      key={k}
+                      className="px-3 py-1.5 text-[10px] tracking-widest uppercase border"
+                      style={{ borderColor: 'rgba(103,6,38,0.2)', color: RED, fontFamily: B }}
+                    >
+                      {k}
+                    </span>
+                  ))}
                 </div>
-                <span className="transition-all text-2xl group-hover:translate-x-1 px-1" style={{ color: 'rgba(26,10,14,0.2)' }}>→</span>
+              )}
+
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-3 px-7 py-3.5 text-[11px] tracking-[0.15em] uppercase font-semibold border transition-all"
+                style={{ borderColor: 'rgba(103,6,38,0.25)', color: '#1A0A0E', fontFamily: B }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = RED; (e.currentTarget as HTMLElement).style.borderColor = RED; (e.currentTarget as HTMLElement).style.color = '#FAF8F2' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(103,6,38,0.25)'; (e.currentTarget as HTMLElement).style.color = '#1A0A0E' }}
+              >
+                [ ENQUIRE ] →
               </Link>
+            </div>
+
+            {/* RIGHT: image */}
+            <div className="overflow-hidden" style={{ aspectRatio: '4/3', backgroundColor: '#F2E6EA' }}>
+              <img
+                src={encodeURI(svc.img)}
+                alt={svc.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <section className="py-20 px-6 lg:px-12" style={{ backgroundColor: '#F2E6EA', borderTop: '1px solid rgba(103,6,38,0.1)' }}>
+        <div className="max-w-225 mx-auto">
+          <p className="text-[11px] tracking-[0.22em] uppercase mb-4" style={{ color: RED, fontFamily: B }}>[ FAQ ]</p>
+          <h2 className="font-black uppercase leading-none mb-10" style={{ fontFamily: D, fontSize: 'clamp(30px, 4vw, 52px)', color: '#1A0A0E' }}>
+            Frequently Asked Questions
+          </h2>
+          <div style={{ borderTop: '1px solid rgba(103,6,38,0.12)' }}>
+            {svc.faqs.map((f, i) => (
+              <FaqItem
+                key={i}
+                num={String(i + 1).padStart(2, '0')}
+                q={f.q}
+                a={f.a}
+                open={openFaq === i}
+                onToggle={() => setOpenFaq(openFaq === i ? -1 : i)}
+              />
             ))}
           </div>
         </div>
       </section>
+
+      
+
     </div>
   )
 }

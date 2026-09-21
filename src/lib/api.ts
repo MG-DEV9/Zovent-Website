@@ -8,6 +8,7 @@ export type Installment = {
   dueDate: string
   status: 'Pending' | 'Paid'
   paidOn?: string
+  razorpayPaymentId?: string
 }
 
 export type PaymentRecord = {
@@ -28,6 +29,9 @@ export type PaymentRecord = {
   remainingAmount?: number
   installments?: Installment[]
   lastPaidAt?: string
+  razorpayPaymentId?: string
+  invoiceUrl?: string
+  invoiceFileName?: string
 }
 
 export type AdminUser = { name: string; email: string; role: string }
@@ -77,7 +81,24 @@ export const api = {
     request<{ message: string; razorpay_payment_id: string }>('/razorpay/verify', {
       method: 'POST', body: JSON.stringify(data),
     }),
+  uploadInvoice: async (paymentId: string, file: File) => {
+    const token = localStorage.getItem('say_token')
+    const body = new FormData()
+    body.append('invoice', file)
+    const response = await fetch(`${API_URL}/payments/${encodeURIComponent(paymentId)}/invoice`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body,
+    })
+    const payload = await response.json().catch(() => ({} as ApiError))
+    if (!response.ok) throw new Error((payload as ApiError).message || `Request failed (${response.status})`)
+    return payload as PaymentRecord
+  },
 }
+
+/** Origin to prepend to server-relative asset paths such as invoiceUrl (e.g. "/uploads/..."). */
+export const ASSET_ORIGIN = API_URL.replace(/\/api$/, '')
+export const assetUrl = (path: string) => `${ASSET_ORIGIN}${path}`
 
 export const clearAdminSession = () => {
   localStorage.removeItem('say_token')
