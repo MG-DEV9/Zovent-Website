@@ -63,7 +63,7 @@ export default function CustomCursor() {
       {/* ring */}
         <div
           ref={ring}
-          className="fixed top-0 left-0 z-9999 pointer-events-nontransition-opacityy] duration-200"
+          className="fixed top-0 left-0 z-9999 pointer-events-none transition-[opacity] duration-200"
         style={{
           width: '40px', height: '40px',
           border: '1px solid rgba(12, 12, 12, 0.64)',
