@@ -10,12 +10,29 @@ dotenv.config();
 
 const app = express();
 
-// Allow all origins (production domains, custom hostnames, staging URLs, localhost) cleanly without throwing CORS preflight errors
+// Allow the production site (apex + www) and local dev servers; reject everything else
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://zovents.com',
+  'https://www.zovents.com',
+  'http://localhost:8443',
+  'http://localhost:5173',
+].filter(Boolean);
+
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
-app.options('*', cors()); // Explicitly handle OPTIONS preflight requests for all endpoints
+app.options('*', cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+})); // Explicitly handle OPTIONS preflight requests for all endpoints
 app.use(express.json());
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
