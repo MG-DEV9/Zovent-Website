@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import { createBrowserRouter } from 'react-router'
 import Root from './layouts/Root'
 import Home from './pages/Home'
+import RouteFallback from './components/RouteFallback'
 
 // ── Lazy-loaded routes — code-split so the initial bundle only ships
 // the layout shell and the home page; everything else loads on demand. ──────
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     Component: Root,
+    HydrateFallback: RouteFallback,
     children: [
       { index: true, Component: Home },
       { path: 'about', lazy: lazyPage(() => import('./pages/About')) },
@@ -33,7 +35,7 @@ export const router = createBrowserRouter([
     ],
   },
   // ── Admin routes (no Header/Footer) ──────────────────────────────────────
-  { path: '/admin/login', lazy: lazyPage(() => import('./pages/AdminLogin')) },
-  { path: '/admin', lazy: lazyPage(() => import('./pages/AdminGuard')) },
-  { path: '/admin/payments', lazy: lazyPage(() => import('./pages/AdminGuard')) },
+  { path: '/admin/login', HydrateFallback: RouteFallback, lazy: lazyPage(() => import('./pages/AdminLogin')) },
+  { path: '/admin', HydrateFallback: RouteFallback, lazy: lazyPage(() => import('./pages/AdminGuard')) },
+  { path: '/admin/payments', HydrateFallback: RouteFallback, lazy: lazyPage(() => import('./pages/AdminGuard')) },
 ])
