@@ -1,4 +1,10 @@
+const dns = require('dns');
 const mongoose = require('mongoose');
+
+// Some networks hand out a DNS server that refuses SRV-type queries (needed
+// to resolve mongodb+srv:// hosts), even though plain lookups work fine.
+// Pointing Node's resolver at a public DNS server sidesteps that.
+dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 const logServerSelectionDetails = (err) => {
   const servers = err?.reason?.servers;
