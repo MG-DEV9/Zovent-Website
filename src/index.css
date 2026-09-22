@@ -18,7 +18,6 @@
   background-color: #FAF8F2;
   color: #1A0A0E;
   scroll-behavior: smooth;
-  cursor: none;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -86,6 +85,23 @@ body::after {
 }
 .cta-double:hover span { transform: translateY(-100%); }
 
+/* ── Nav link underline ── */
+.nav-link { position: relative; }
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.nav-link:hover::after,
+.nav-link[data-active="true"]::after { transform: scaleX(1); }
+
 /* ── Scrollbar ── */
 html { scrollbar-width: thin; scrollbar-color: #BAD797 #FAF8F2; }
 ::-webkit-scrollbar       { width: 4px; }
@@ -98,10 +114,3 @@ html { scrollbar-width: thin; scrollbar-color: #BAD797 #FAF8F2; }
 .font-body    { font-family: Georgia, 'Times New Roman', serif; }
 .font-label   { font-family: 'Manrope', system-ui, sans-serif; }
 
-/* restore cursor on mobile / touch */
-@media (hover: none) {
-  :root { cursor: auto; }
-}
-
-/* admin dashboard has no custom-cursor overlay (renders outside the public Root layout) */
-.admin-shell { cursor: auto; }

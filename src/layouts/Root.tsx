@@ -2,7 +2,6 @@ import { Outlet, useLocation } from 'react-router'
 import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import CustomCursor from '../components/CustomCursor'
 import Preloader from '../components/Preloader'
 import WhatsAppFloat from '../components/WhatsAppFloat'
 
@@ -26,7 +25,6 @@ export default function Root() {
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
       {!entered && <Preloader onEnter={handleEnter} />}
-      <CustomCursor />
       <WhatsAppFloat />
       <Header />
       <main className="flex-1 transition-opacity duration-300" style={{ opacity: visible ? 1 : 0 }}>

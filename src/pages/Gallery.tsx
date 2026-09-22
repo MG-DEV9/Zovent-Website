@@ -103,7 +103,6 @@ export default function Gallery() {
                 color: active === cat ? '#670626' : 'rgba(26,10,14,0.35)',
                 fontFamily: B,
                 background: 'none',
-                cursor: 'none',
               }}
             >
               {cat}
@@ -129,7 +128,7 @@ export default function Gallery() {
               {/* Image block */}
               <div
                 className="relative overflow-hidden"
-                style={{ ...aspectStyle(photo.aspect), backgroundColor: '#F2E6EA', cursor: 'none' }}
+                style={{ ...aspectStyle(photo.aspect), backgroundColor: '#F2E6EA' }}
                 onClick={() => setLightbox(i)}
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(null)}
@@ -182,7 +181,6 @@ export default function Gallery() {
                     fontFamily: D,
                     fontSize: 'clamp(15px, 2vw, 22px)',
                     color: hovered === i ? '#670626' : '#1A0A0E',
-                    cursor: 'none',
                   }}
                 >
                   {photo.title}
@@ -204,7 +202,7 @@ export default function Gallery() {
             <button
               onClick={() => setActive('ALL')}
               className="text-[11px] tracking-[0.18em] uppercase border px-5 py-2.5 transition-colors"
-              style={{ borderColor: 'rgba(103,6,38,0.2)', color: 'rgba(26,10,14,0.5)', fontFamily: B, cursor: 'none', background: 'none' }}
+              style={{ borderColor: 'rgba(103,6,38,0.2)', color: 'rgba(26,10,14,0.5)', fontFamily: B, background: 'none' }}
             >
               View All
             </button>
@@ -220,7 +218,7 @@ export default function Gallery() {
         <button
           onClick={() => setActive('ALL')}
           className="cta-double text-[11px] font-semibold tracking-[0.2em] uppercase"
-          style={{ fontFamily: B, cursor: 'none', background: 'none', border: 'none', color: '#1A0A0E' }}
+          style={{ fontFamily: B, background: 'none', border: 'none', color: '#1A0A0E' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#670626' }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#1A0A0E' }}
         >
@@ -233,13 +231,13 @@ export default function Gallery() {
       {lightbox !== null && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(26,10,14,0.95)', cursor: 'none' }}
+          style={{ backgroundColor: 'rgba(26,10,14,0.95)' }}
           onClick={() => setLightbox(null)}
         >
           {/* Close */}
           <button
             className="absolute top-6 right-8 transition-colors"
-            style={{ fontFamily: B, fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(250,248,242,0.4)', cursor: 'none', background: 'none', border: 'none' }}
+            style={{ fontFamily: B, fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(250,248,242,0.4)', background: 'none', border: 'none' }}
             onClick={() => setLightbox(null)}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FAF8F2' }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(250,248,242,0.4)' }}
@@ -250,7 +248,7 @@ export default function Gallery() {
           {/* Prev */}
           <button
             className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 text-4xl p-4 transition-colors"
-            style={{ color: 'rgba(250,248,242,0.3)', cursor: 'none', background: 'none', border: 'none' }}
+            style={{ color: 'rgba(250,248,242,0.3)', background: 'none', border: 'none' }}
             onClick={e => { e.stopPropagation(); setLightbox(l => l !== null ? (l - 1 + filtered.length) % filtered.length : null) }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FAF8F2' }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(250,248,242,0.3)' }}
@@ -285,7 +283,7 @@ export default function Gallery() {
           {/* Next */}
           <button
             className="absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 text-4xl p-4 transition-colors"
-            style={{ color: 'rgba(250,248,242,0.3)', cursor: 'none', background: 'none', border: 'none' }}
+            style={{ color: 'rgba(250,248,242,0.3)', background: 'none', border: 'none' }}
             onClick={e => { e.stopPropagation(); setLightbox(l => l !== null ? (l + 1) % filtered.length : null) }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FAF8F2' }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(250,248,242,0.3)' }}

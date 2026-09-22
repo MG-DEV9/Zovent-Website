@@ -137,7 +137,6 @@ export default function Preloader({ onEnter }: Props) {
           color: 'rgba(250,248,242,0.5)',
           background: 'none',
           border: 'none',
-          cursor: 'none',
           transition: 'opacity 0.8s ease, transform 0.8s ease, color 0.2s ease',
           opacity: visible ? 1 : 0,
           transform: visible ? 'none' : 'translateY(12px)',
